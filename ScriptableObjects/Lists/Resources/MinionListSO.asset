@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c79c614af6848d341bb632e007d0729d, type: 3}
+  m_Name: MinionListSO
+  m_EditorClassIdentifier: 
+  list:
+  - {fileID: 11400000, guid: f0f3b545791fb114aa0120bfeb613ce0, type: 2}
+  - {fileID: 11400000, guid: 146b5e925cc381f4aa17cc9726155851, type: 2}
+  - {fileID: 11400000, guid: 0254ea16c7eb3454f8f299ac23fbbcc0, type: 2}
+  - {fileID: 11400000, guid: 23cacb0f658cdce41b9124c6a6f2a7f0, type: 2}
+  - {fileID: 11400000, guid: e656bf882c4bdc64699d5e46cdf1ef40, type: 2}
+  - {fileID: 11400000, guid: a3d43236115a91446b3d3d1a649d5d23, type: 2}
