@@ -9,9 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3cdcf753a45c7e4a890c163c2f1c58f, type: 3}
+  m_Script: {fileID: 11500000, guid: 20b35eb74e0d2014f9b2bd067368f412, type: 3}
   m_Name: strongerRock
   m_EditorClassIdentifier: 
-  minionSet: {fileID: 11400000, guid: 4929f60a4680cb04e8b0ba602882ba70, type: 2}
-  nameString: strongerRock
+  prefab: {fileID: 0}
+  nameString: StrongerRock
   sprite: {fileID: 21300000, guid: 65d1d9902bd4a2e43bb8898bbfc19188, type: 3}
+  healthAmountMax: 20
+  summoningCostAmountArray: []

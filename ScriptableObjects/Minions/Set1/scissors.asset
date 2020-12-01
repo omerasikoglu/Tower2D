@@ -9,9 +9,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3cdcf753a45c7e4a890c163c2f1c58f, type: 3}
+  m_Script: {fileID: 11500000, guid: 20b35eb74e0d2014f9b2bd067368f412, type: 3}
   m_Name: scissors
   m_EditorClassIdentifier: 
-  minionSet: {fileID: 11400000, guid: 4929f60a4680cb04e8b0ba602882ba70, type: 2}
-  nameString: scissors
+  prefab: {fileID: 7763929554639582286, guid: 42a2dc09ac2f075488740e21acc1b318, type: 3}
+  nameString: Scissors
   sprite: {fileID: 21300000, guid: 535f5474277c70a4980665b73e741772, type: 3}
+  healthAmountMax: 10
+  summoningCostAmountArray:
+  - resourceType: {fileID: 11400000, guid: ba6e983738839974fa3f6d5b008cea93, type: 2}
+    amount: 1
