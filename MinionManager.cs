@@ -14,12 +14,12 @@ public class MinionManager : MonoBehaviour
     {
         public MinionTypeSO activeMinionType;
     }
-
     [SerializeField] private bool isFirstSet;
 
     [SerializeField] private bool haveSummoningPortal = true;
     [SerializeField] private Transform mateSummoningPortalPosition;
 
+    
     private Vector3 mateSummoningPosition;
     private MinionSetSO minionSet;
     private MinionTypeSO activeMinionType;
@@ -33,7 +33,7 @@ public class MinionManager : MonoBehaviour
 
         if (haveSummoningPortal) mateSummoningPosition = mateSummoningPortalPosition.position;   //minyon summonlama yerini setleme
         else mateSummoningPosition = UtilsClass.GetMouseWorldPosition();
-    }
+    } 
 
     private void Update()
     {

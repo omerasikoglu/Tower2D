@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Minion : MonoBehaviour
+public class Minion : MonoBehaviour, IHandleTargeting
 {
     public static Minion Create(MinionTypeSO minionType, bool isMate, Vector3 position, float movementSpeed = 5f)
     {
@@ -26,37 +26,28 @@ public class Minion : MonoBehaviour
 
     [SerializeField] private int damageAmount;
     [SerializeField] private bool haveMinionTargeting = true;
-
-    private bool isMate = true;
+    public bool isMate;
     private float movementSpeed;
-
+    //private MinionTypeHolder minionTypeHolder;
     private Rigidbody2D rigidbody2d;
     private Transform targetTransform;
-    private Transform targetMinionTransform;
+   
     private HealthSystem healthSystem;
 
-    private float lookForTargetTimer;
-    private float lookForTargetTimerMax = .2f;
+    
 
+    public void HandleTargeting(Transform targetTransform)
+    {
+        this.targetTransform = targetTransform;
+    }
     private void Start()
     {
-        if (isMate)
-        {
-            if (BuildingManager.Instance.GetEnemyHQBuilding() != null) targetTransform = BuildingManager.Instance.GetEnemyHQBuilding().transform;
-
-            else Destroy(gameObject);
-        }
-        else
-        {
-            if (BuildingManager.Instance.GetYourHQBuilding() != null) targetTransform = BuildingManager.Instance.GetYourHQBuilding().transform;
-
-            else Destroy(gameObject);
-        }
+        //minionTypeHolder = GetComponent<MinionTypeHolder>();
 
         rigidbody2d = GetComponent<Rigidbody2D>();
         healthSystem = GetComponent<HealthSystem>();
 
-        lookForTargetTimer = Random.Range(0f, lookForTargetTimerMax);
+       
 
         healthSystem.OnDied += HealthSystem_OnDied;
     }
@@ -66,9 +57,8 @@ public class Minion : MonoBehaviour
     }
     private void Update()
     {
-        //if (targetBuildingTransform == null) Destroy(gameObject);
         HandleMovement();
-        HandleTargeting();
+        
     }
     private void HandleMovement()
     {
@@ -77,26 +67,18 @@ public class Minion : MonoBehaviour
             Vector3 moveDir = (targetTransform.position - transform.position).normalized;
             rigidbody2d.velocity = moveDir * movementSpeed;
         }
-        else
+        else //hedefi ölünce bu minyonun durması
         {
-            rigidbody2d.velocity = Vector2.zero;
+            //rigidbody2d.velocity = Vector2.zero;
         }
     }
-    private void HandleTargeting()
-    {
-
-        lookForTargetTimer -= Time.deltaTime;
-        if (lookForTargetTimer < 0f)
-        {
-            lookForTargetTimer += lookForTargetTimerMax;
-            LookForMinions();
-
-        }
-    }
-    private void OnCollisionEnter2D(Collision2D collision)  //collision -->çarptıgımız objenin collider'ı
+    
+    private void OnCollisionEnter2D(Collision2D collision)  //collision --> çarptıgımız objenin collider'ı
     {
         Building building = collision.gameObject.GetComponent<Building>();
         Minion enemyMinion = collision.gameObject.GetComponent<Minion>();
+        MinionTypeHolder type = collision.gameObject.GetComponent<MinionTypeHolder>();
+        
         if (building != null)
         {
             HealthSystem healthSystem = building.GetComponent<HealthSystem>();
@@ -109,68 +91,5 @@ public class Minion : MonoBehaviour
             healthSystem.Damage(damageAmount);
         }
     }
-    private void LookForMinions()
-    {
-        float targetMaxRadius = 10f;
-        Collider2D[] collider2DArray = Physics2D.OverlapCircleAll(transform.position, targetMaxRadius);
-
-        foreach (Collider2D collider2D in collider2DArray)
-        {
-            Minion otherMinion = collider2D.GetComponent<Minion>();
-            if (otherMinion != null && otherMinion.isMate != isMate)
-            {
-                if (targetMinionTransform == null)
-                {
-                    targetMinionTransform = otherMinion.transform;
-                }
-                else
-                {   //hedef minyon varsa ama daha yakın minyon da varsa
-                    if (Vector3.Distance(transform.position, otherMinion.transform.position) <
-                        Vector3.Distance(transform.position, targetMinionTransform.position))
-                    {
-                        targetMinionTransform = otherMinion.transform;
-                    }
-                }
-            }
-        }
-        if (targetMinionTransform == null) LookForBuildings();
-        else targetTransform = targetMinionTransform;
-    }
-    private void LookForBuildings()
-    {
-        float targetMaxRadius = 10f;
-        Collider2D[] collider2DArray = Physics2D.OverlapCircleAll(transform.position, targetMaxRadius);
-
-        foreach (Collider2D collider2D in collider2DArray)
-        {
-            Building building = collider2D.GetComponent<Building>();    //etrafında düşman bina varsa 
-
-            if (building != null && building.isFriendlyBuilding != isMate)
-            {
-                if (targetTransform == null)    //biz henüz biyere hedef almadıysak
-                {
-                    targetTransform = building.transform;
-                }
-                else
-                {   //hedef bina varsa ama daha yakın bina da varsa
-                    if (Vector3.Distance(transform.position, building.transform.position) <
-                        Vector3.Distance(transform.position, targetTransform.position))
-                    {
-                        targetTransform = building.transform;
-                    }
-                }
-            }
-
-
-        }
-        if (targetTransform == null)    //hareket halindeyken etrafta bina bulamadıysa
-        {
-            Destroy(gameObject);
-            //if (isMate) targetBuildingTransform = BuildingManager.Instance.GetEnemyHQBuilding().transform;
-            //else targetBuildingTransform = BuildingManager.Instance.GetYourHQBuilding().transform;
-        }
-
-    }
-
     
 }
