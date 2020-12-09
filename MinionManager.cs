@@ -19,7 +19,7 @@ public class MinionManager : MonoBehaviour
     [SerializeField] private bool haveSummoningPortal = true;
     [SerializeField] private Transform mateSummoningPortalPosition;
 
-    
+
     private Vector3 mateSummoningPosition;
     private MinionSetSO minionSet;
     private MinionTypeSO activeMinionType;
@@ -33,7 +33,7 @@ public class MinionManager : MonoBehaviour
 
         if (haveSummoningPortal) mateSummoningPosition = mateSummoningPortalPosition.position;   //minyon summonlama yerini setleme
         else mateSummoningPosition = UtilsClass.GetMouseWorldPosition();
-    } 
+    }
 
     private void Update()
     {
@@ -117,17 +117,9 @@ public class MinionManager : MonoBehaviour
     {
         int minionIndex = UnityEngine.Random.Range(0, 3);
         MinionTypeSO minion;
-        bool strongerUnits = UnityEngine.Random.Range(0, 100) >= 80;
-        if (strongerUnits)
-        {
-            minion = minionSet.list[minionIndex + 3];
-            return minion;
-        }
-        else
-        {
-            minion = minionSet.list[minionIndex];
-            return minion;
-        }
+        minion = minionSet.list[minionIndex];
+        return minion;
+
     }
     //public MinionTypeSO GetRandomMinionFromRandomSet()
     //{

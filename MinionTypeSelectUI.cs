@@ -14,6 +14,7 @@ public class MinionTypeSelectUI : MonoBehaviour
     private Dictionary<MinionTypeSO, Transform> btnTransformDictionary;
     private Transform arrowButtonTransform;
     private MinionSetSO minionSet;
+    private GridLayoutGroup gridLayoutGroup;
 
     private void Awake()
     {
@@ -25,13 +26,13 @@ public class MinionTypeSelectUI : MonoBehaviour
 
         btnTransformDictionary = new Dictionary<MinionTypeSO, Transform>();
 
-        int index = 0;
+       // int index = 0;
 
         arrowButtonTransform = Instantiate(btnTemplate, transform);
         arrowButtonTransform.gameObject.SetActive(true);
 
-        float offsetAmount = +120f;
-        arrowButtonTransform.GetComponent<RectTransform>().anchoredPosition = new Vector2(offsetAmount * index, 0);
+       // float offsetAmount = +120f;
+       // arrowButtonTransform.GetComponent<RectTransform>().anchoredPosition = new Vector2(offsetAmount * index, 0);
 
         arrowButtonTransform.Find("image").GetComponent<Image>().sprite = arrowSprite;
         arrowButtonTransform.Find("image").GetComponent<RectTransform>().sizeDelta = new Vector2(0, -30f);
@@ -44,7 +45,7 @@ public class MinionTypeSelectUI : MonoBehaviour
 
         mouseEnterExitEvents.OnMouseEnter += (object sender, EventArgs e) => { TooltipUI.Instance.Show("Arrow"); };
         mouseEnterExitEvents.OnMouseExit += (object sender, EventArgs e) => { TooltipUI.Instance.Hide(); };
-        index++;
+        //index++;
 
         foreach (MinionTypeSO minionType in minionSet.list)
         {
@@ -52,8 +53,8 @@ public class MinionTypeSelectUI : MonoBehaviour
             Transform btnTransform = Instantiate(btnTemplate, transform);
             btnTransform.gameObject.SetActive(true);
 
-            offsetAmount = +120f;
-            btnTransform.GetComponent<RectTransform>().anchoredPosition = new Vector2(offsetAmount * index, 0);
+           // offsetAmount = +120f;
+          //  btnTransform.GetComponent<RectTransform>().anchoredPosition = new Vector2(offsetAmount * index, 0);
 
             btnTransform.Find("image").GetComponent<Image>().sprite = minionType.sprite;
             btnTransform.GetComponent<Button>().onClick.AddListener(() =>
@@ -77,7 +78,7 @@ public class MinionTypeSelectUI : MonoBehaviour
 
             btnTransformDictionary[minionType] = btnTransform;
 
-            index++;
+           // index++;
         }
     }
     private void Start()
