@@ -129,62 +129,53 @@ public class PlayerController : MonoBehaviour, ICollider
     }
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.X))
-        {
-            if (Time.time >= (lastDash + dashCooldown)) AttemptToDash();
-        }
-        CheckInput();
-        //CheckOnGrounded();
+       
+        CheckInputs();
         CheckWallGrab();
-
         CheckMovementDirection();
         CheckDash();
-        // CheckIfWallSliding();
     }
     private void FixedUpdate()
     {
         ApplyMovement();
-        CheckJumping();
+        ApplyJumping();
     }
 
-    private void CheckIfWallSliding()
-    {
-        if (IsTouchingWall() && !isGrounded && rigidbody2d.velocity.y < 0)
-        {
-            wallSliding = true;
-        }
-        else
-        {
-            wallSliding = false;
-        }
-    }
-
-    private void CheckInput()
+    private void CheckInputs()
     {
         wallSliding = false;
+        isMoving = false;
+
         x = Input.GetAxisRaw("Horizontal");    //yürüme
 
-        if (x != 0) isMoving = true;    //yürüyor
-        else isMoving = false;
+        if (Input.GetKeyDown(KeyCode.X)) //dash atma
+        {
+            if (Time.time >= (lastDash + dashCooldown)) AttemptToDash();
+        }
+
         if (isGrounded)
         {
             canJumpFromRight = true;
             canJumpFromLeft = true;
 
-            if (Input.GetKeyDown(KeyCode.C))
+            if (x != 0) //yürüyor
             {
-                //rigidbody2d.velocity = new Vector2(rigidbody2d.velocity.x, 0);
+                isMoving = true;
+
+                PlayAnimation(AnimationType.WALK);
+            }
+
+            else if (x == 0) //duruyor
+            {
+                PlayAnimation(AnimationType.IDLE);
+                //buraya 5 sn bekleyince devreye giren ek animasyon ekle
+            }
+
+            if (Input.GetKeyDown(KeyCode.C)) //zıplıyor
+            {
                 rigidbody2d.velocity += jumpForce * (Vector2.up);
             }
 
-            if (isMoving)
-            {
-                PlayAnimation(AnimationType.WALK);
-            }
-            else
-            {
-                PlayAnimation(AnimationType.IDLE);
-            }
         }
         else if (!isGrounded)   //yere değmiyorsa
         {
@@ -236,7 +227,7 @@ public class PlayerController : MonoBehaviour, ICollider
                     }
                 }
             }
-            else if (!onLeftWall && !onRightWall)
+            else if (!IsTouchingWall())
             {
                 canJumpFromRight = true;
                 canJumpFromLeft = true;
@@ -271,7 +262,7 @@ public class PlayerController : MonoBehaviour, ICollider
                     lastImageXpos = transform.position.x;
                 }
             }
-            if (dashTimeLeft <= 0 || onRightWall || onLeftWall)
+            if (dashTimeLeft <= 0 || IsTouchingWall())
             {
                 isDashing = false;
                 canMove = true;
@@ -280,14 +271,17 @@ public class PlayerController : MonoBehaviour, ICollider
 
         }
     }
-    private void CheckJumping()
+    private void ApplyJumping()
     {
         if (rigidbody2d.velocity.y < 0)      //düşüyorsa
         {
-            rigidbody2d.velocity += Vector2.up * Physics2D.gravity.y * (fallMultiplier - 1) * Time.deltaTime;
-            if (wallSliding)
+            if (!wallSliding)
             {
-                rigidbody2d.velocity = new Vector2(rigidbody2d.velocity.x, -2f);
+                rigidbody2d.velocity += Vector2.up * Physics2D.gravity.y * (fallMultiplier - 1) * Time.deltaTime;
+            }
+            else if (wallSliding)
+            {
+                rigidbody2d.velocity = new Vector2(rigidbody2d.velocity.x, -wallSlideSpeed);
             }
         }
         else if (rigidbody2d.velocity.y > 0 && !Input.GetKey(KeyCode.C))      //zıpladıysa
@@ -331,21 +325,21 @@ public class PlayerController : MonoBehaviour, ICollider
     {
         if (canMove)
         {
-            if (isGrounded)
+            if (isGrounded) //yürüme hızı
             {
                 rigidbody2d.velocity = new Vector2(movementSpeed * x, rigidbody2d.velocity.y);
             }
-            else if (!isGrounded && !wallSliding && x != 0)
+            else if (!isGrounded && !wallSliding && x != 0) //havada yürüme hızı
             {
                 Vector2 forceToAdd = new Vector2(movementForceInAir * x, 0f);
                 rigidbody2d.AddForce(forceToAdd);
 
-                if (Mathf.Abs(rigidbody2d.velocity.x) > movementSpeed)
+                if (Mathf.Abs(rigidbody2d.velocity.x) > movementSpeed) //havada yürüme hızını sınırlama
                 {
                     rigidbody2d.velocity = new Vector2(movementSpeed * x, rigidbody2d.velocity.y);
                 }
             }
-            else if (!isGrounded && !wallSliding && x == 0) //havada durdugunda x'teki hızını azaltma
+            else if (!isGrounded && !wallSliding && x == 0) //havada durdugunda yürüme hızını azaltma
             {
                 rigidbody2d.velocity = new Vector2(rigidbody2d.velocity.x * airDragMultiplier, rigidbody2d.velocity.y);
             }
@@ -353,7 +347,7 @@ public class PlayerController : MonoBehaviour, ICollider
 
         if (wallSliding)
         {
-            if (rigidbody2d.velocity.y < -wallSlideSpeed)
+            if (rigidbody2d.velocity.y < -wallSlideSpeed) //kayma hızını sınırlama
             {
                 rigidbody2d.velocity = new Vector2(rigidbody2d.velocity.x, -wallSlideSpeed);
             }
