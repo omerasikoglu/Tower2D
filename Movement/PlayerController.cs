@@ -13,16 +13,20 @@ public class PlayerController : MonoBehaviour, ICollider
     private enum AnimationType
     {
         IDLE,
+        SECOND_IDLE,
         WALK,
         WALLGRAB,
         JUMP,
         DASH,
     }
 
-    private SpriteAnimator spriteAnimator;
     private AnimationType activeAnimationType;
+    private SecondIdleAnimationTimer secondIdleAnimationTimer;
+    private bool secondIdleAnimationCountdownStarter;
 
+    [SerializeField] private SpriteAnimator spriteAnimator;
     [SerializeField] private Sprite[] idleAnimationFrameArray;
+    [SerializeField] private Sprite[] secondIdleAnimationFrameArray;
     [SerializeField] private Sprite[] walkingAnimationFrameArray;
     [SerializeField] private Sprite[] jumpingAnimationFrameArray;
     [SerializeField] private Sprite[] dashAnimationFrameArray;
@@ -71,7 +75,7 @@ public class PlayerController : MonoBehaviour, ICollider
     #region Wall-e
 
     //vars
-    private bool wallGrab;
+    private bool wallGrabbing;
     private bool wallSliding;
     private bool canJumpFromRight;
     private bool canJumpFromLeft;
@@ -85,6 +89,7 @@ public class PlayerController : MonoBehaviour, ICollider
     #endregion
 
     #region Incoming 
+
 
     //eklenecekler
     private bool canMove = true;
@@ -125,11 +130,22 @@ public class PlayerController : MonoBehaviour, ICollider
     private void Start()
     {
         isFacingRight = true;
-        //spriteAnimator.PlayAnimation(idleAnimationFrameArray, .2f,false);
+        spriteAnimator.PlayAnimation(idleAnimationFrameArray, .2f);
+        //new PlayerController.SecondIdleAnimationTimer { timer = 2f };
     }
     private void Update()
     {
-       
+        if (secondIdleAnimationTimer != null && secondIdleAnimationCountdownStarter == true)
+        {
+            secondIdleAnimationTimer.timer -= Time.deltaTime;
+            if (secondIdleAnimationTimer.timer <= 0)
+            {
+                PlayAnimation(AnimationType.SECOND_IDLE);
+                Debug.Log("oldi");
+                Countdown(false);
+            }
+        }
+
         CheckInputs();
         CheckWallGrab();
         CheckMovementDirection();
@@ -145,6 +161,7 @@ public class PlayerController : MonoBehaviour, ICollider
     {
         wallSliding = false;
         isMoving = false;
+        wallGrabbing = false;
 
         x = Input.GetAxisRaw("Horizontal");    //yürüme
 
@@ -161,19 +178,24 @@ public class PlayerController : MonoBehaviour, ICollider
             if (x != 0) //yürüyor
             {
                 isMoving = true;
-
+                Countdown(false);
                 PlayAnimation(AnimationType.WALK);
             }
 
             else if (x == 0) //duruyor
             {
-                PlayAnimation(AnimationType.IDLE);
+                if(!secondIdleAnimationCountdownStarter && activeAnimationType!=AnimationType.SECOND_IDLE) 
+                    Countdown(true, new SecondIdleAnimationTimer { timer = 2f });
+
+                //PlayAnimation(AnimationType.IDLE);
                 //buraya 5 sn bekleyince devreye giren ek animasyon ekle
+
             }
 
             if (Input.GetKeyDown(KeyCode.C)) //zıplıyor
             {
                 rigidbody2d.velocity += jumpForce * (Vector2.up);
+                PlayAnimation(AnimationType.JUMP);
             }
 
         }
@@ -181,10 +203,11 @@ public class PlayerController : MonoBehaviour, ICollider
         {
             if (onRightWall)
             {
-                if (Input.GetKey(KeyCode.Z)) wallGrab = true;
+                if (Input.GetKey(KeyCode.Z)) wallGrabbing = true;
                 else
                 {
-                    wallGrab = false;
+                    wallGrabbing = false;
+                    PlayAnimation(AnimationType.WALLGRAB);
                 }
 
                 if (x == 1 && rigidbody2d.velocity.y < 0) //duvarda sağa tıklıyorsa
@@ -205,10 +228,10 @@ public class PlayerController : MonoBehaviour, ICollider
             }
             else if (onLeftWall)
             {
-                if (Input.GetKey(KeyCode.Z)) wallGrab = true;
+                if (Input.GetKey(KeyCode.Z)) wallGrabbing = true;
                 else
                 {
-                    wallGrab = false;
+                    wallGrabbing = false;
                 }
 
                 if (x == -1 && rigidbody2d.velocity.y < 0) //duvarda sola tıklıyorsa
@@ -291,7 +314,7 @@ public class PlayerController : MonoBehaviour, ICollider
     }
     private void CheckWallGrab()
     {
-        if (wallGrab)
+        if (wallGrabbing)
         {
             rigidbody2d.gravityScale = 0;
             rigidbody2d.velocity = new Vector2(rigidbody2d.velocity.x, 0);
@@ -363,19 +386,22 @@ public class PlayerController : MonoBehaviour, ICollider
             switch (animationType)
             {
                 case AnimationType.IDLE:
-                    //spriteAnimator.PlayAnimation(idleAnimationFrameArray, .2f,true);//float arttıkça animasyon yavaşlar
+                    spriteAnimator.PlayAnimation(idleAnimationFrameArray, .2f);//float arttıkça animasyon yavaşlar
                     break;
                 case AnimationType.WALK:
-                    //spriteAnimator.PlayAnimation(walkingAnimationFrameArray, .1f, true);
+                    spriteAnimator.PlayAnimation(walkingAnimationFrameArray, .1f);
                     break;
                 case AnimationType.DASH:
-                    //spriteAnimator.PlayAnimation(dashAnimationFrameArray, .1f, true);
+                    spriteAnimator.PlayAnimation(dashAnimationFrameArray, .1f);
                     break;
                 case AnimationType.JUMP:
-                    //spriteAnimator.PlayAnimation(jumpingAnimationFrameArray, .1f, true);
+                    spriteAnimator.PlayAnimation(jumpingAnimationFrameArray, .1f);
                     break;
                 case AnimationType.WALLGRAB:
-                    //spriteAnimator.PlayAnimation(wallGrabbingAnimationFrameArray, .1f, true);
+                    spriteAnimator.PlayAnimation(wallGrabbingAnimationFrameArray, .1f);
+                    break;
+                case AnimationType.SECOND_IDLE:
+                    spriteAnimator.PlayAnimation(secondIdleAnimationFrameArray, .1f);
                     break;
 
             }
@@ -390,4 +416,15 @@ public class PlayerController : MonoBehaviour, ICollider
         }
         else return false;
     }
+
+    public class SecondIdleAnimationTimer
+    {
+        public float timer;
+    }
+    public void Countdown(bool secondIdleAnimationCountdownStarter, SecondIdleAnimationTimer secondIdleAnimationTimer = null)
+    {
+        this.secondIdleAnimationCountdownStarter = secondIdleAnimationCountdownStarter;
+        this.secondIdleAnimationTimer = secondIdleAnimationTimer;
+    }
+
 }

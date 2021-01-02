@@ -7,6 +7,7 @@ public class RectangleCollider : MonoBehaviour
     [SerializeField] private LayerMask platformLayer;
 
     private BoxCollider2D boxCollider2d;
+    private float extraWidth = .3f;
 
     private void Awake()
     {
@@ -20,7 +21,6 @@ public class RectangleCollider : MonoBehaviour
     }
     private bool OnRightWall()
     {
-        float extraWidth = .5f;
         RaycastHit2D raycastHit = Physics2D.BoxCast(boxCollider2d.bounds.center + new Vector3(0, (boxCollider2d.bounds.extents.y) / 4), boxCollider2d.bounds.size, 0f, Vector2.right, extraWidth, platformLayer);
         Color rayColor;
         if (raycastHit.collider != null) rayColor = Color.yellow;
@@ -33,7 +33,6 @@ public class RectangleCollider : MonoBehaviour
     }
     private bool OnLeftWall()
     {
-        float extraWidth = .5f;
         RaycastHit2D raycastHit = Physics2D.BoxCast(boxCollider2d.bounds.center + new Vector3(0, (boxCollider2d.bounds.extents.y) / 4), boxCollider2d.bounds.size, 0f, Vector2.left, extraWidth, platformLayer);
         Color rayColor;
         if (raycastHit.collider != null) rayColor = Color.cyan;
